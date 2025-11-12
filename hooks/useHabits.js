@@ -37,7 +37,7 @@ export const HabitsProvider = ({ children }) => {
   };
 
   const addHabit = async (habit) => {
-    const newHabit = { ...habit, id: uuidv4(), records: {} };
+    const newHabit = { ...habit, id: uuidv4(), records: {}, repeatWeekly: true, startDate: new Date().toISOString().split('T')[0], repeatMode: 'weekly' };
     const newHabits = [...habits, newHabit];
     await saveHabits(newHabits);
   };

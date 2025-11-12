@@ -17,7 +17,18 @@ export default function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState(todayISO);
 
   const dayName = new Date(selectedDate).toLocaleString('en-US', { weekday: 'short' }); // Mon...
-  const habitsForSelectedDay = habits.filter(h => h.days.includes(dayName));
+  const habitsForSelectedDay = habits.filter(h => {
+    if (!h.days.includes(dayName)) return false;
+
+    // 시작 날짜와 종료 날짜를 확인하여 해당 기간에만 습관을 표시
+    if (h.startDate && selectedDate < h.startDate) return false;
+    if (h.endDate && selectedDate > h.endDate) return false;
+
+    return true;
+  });
+
+
+
 
   // generate grid items for the selected month such that week starts on Sunday
   const getMonthGrid = (refDate) => {
@@ -82,7 +93,11 @@ export default function HomeScreen() {
       <View key={item || `empty-${idx}`} style={styles.calendarDay}>
         <TouchableOpacity 
           onPress={() => item && setSelectedDate(item)} 
-          style={[styles.dayButton, isSelected && styles.selectedDay]}
+          style={[
+            styles.dayButton,
+            isSelected && styles.selectedDay,
+            isToday && { borderColor: theme, borderWidth: 2 }
+          ]}
         >
           {typeof completion === 'number' && completion >= 0 && (
             <View style={[
@@ -96,10 +111,10 @@ export default function HomeScreen() {
             isToday && styles.todayText,
             isSaturday && styles.saturdayText,
             isSunday && styles.sundayText,
+            completion === -1 && styles.noHabitDayText,
           ]}>
             {item ? new Date(item).getDate() : ''}
           </Text>
-          {isToday && <View style={[styles.todayMarker, { backgroundColor: theme }]} />}
         </TouchableOpacity>
       </View>
     );
@@ -218,7 +233,7 @@ const styles = StyleSheet.create({
   },
   selectedDay: {
     backgroundColor: '#fff',
-    borderColor: '#fff',
+    borderColor: '#efefef',
     borderWidth: 1,
   },
   selectedDayText: {
@@ -238,12 +253,8 @@ const styles = StyleSheet.create({
   sundayText: {
     color: '#FF3B30', // 빨간색
   },
-  todayMarker: {
-    position: 'absolute',
-    bottom: 2,
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+  noHabitDayText: {
+    opacity: 0.3,
   },
   habitSection: {
     flex: 1,
