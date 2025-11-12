@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const THEMES = {
-  blue: '#007AFF',
-  green: '#34C759',
-  red: '#FF3B30',
-  orange: '#FF9500',
-  purple: '#AF52DE',
+export const THEMES = { // 파스텔톤 색상으로 변경
+  blue: '#A7D1FF',   // 파스텔 블루
+  green: '#C1FFC1',  // 파스텔 그린
+  red: '#FFC0CB',    // 파스텔 핑크
+  orange: '#FFE5B4', // 파스텔 오렌지
+  purple: '#E0BBE4', // 파스텔 라벤더
 };
 
 const ThemeContext = createContext();

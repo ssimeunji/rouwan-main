@@ -72,6 +72,11 @@ export default function HomeScreen() {
     const isSelected = item === selectedDate;
     const isToday = item === todayISO;
     const completion = completionRates[item];
+    
+    const date = new Date(item);
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+    const isSunday = dayOfWeek === 0;
+    const isSaturday = dayOfWeek === 6;
 
     return (
       <View key={item || `empty-${idx}`} style={styles.calendarDay}>
@@ -85,7 +90,13 @@ export default function HomeScreen() {
               { height: `${completion}%`, opacity: completion / 100 * 0.8 + 0.2, backgroundColor: theme }
             ]} />
           )}
-          <Text style={[styles.dayText, isSelected && styles.selectedDayText, isToday && styles.todayText]}>
+          <Text style={[
+            styles.dayText,
+            isSelected && styles.selectedDayText,
+            isToday && styles.todayText,
+            isSaturday && styles.saturdayText,
+            isSunday && styles.sundayText,
+          ]}>
             {item ? new Date(item).getDate() : ''}
           </Text>
           {isToday && <View style={[styles.todayMarker, { backgroundColor: theme }]} />}
@@ -114,8 +125,14 @@ export default function HomeScreen() {
 
           {/* weekday header starting Sunday */}
           <View style={styles.weekHeader}>
-            {['일', '월', '화', '수', '목', '금', '토'].map(w => (
-              <Text key={w} style={styles.weekHeaderText}>{w}</Text>
+            {['일', '월', '화', '수', '목', '금', '토'].map((w, index) => (
+              <Text
+                key={w}
+                style={[
+                  styles.weekHeaderText,
+                  index === 0 && styles.sundayText, // '일'요일 (index 0)
+                  index === 6 && styles.saturdayText, // '토'요일 (index 6)
+                ]}>{w}</Text>
             ))}
           </View>
 
@@ -200,11 +217,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   selectedDay: {
-    borderColor: '#333',
+    backgroundColor: '#fff',
+    borderColor: '#fff',
     borderWidth: 1,
   },
   selectedDayText: {
-    fontWeight: 'bold',
     color: '#333',
   },
   dayText: {
@@ -213,8 +230,13 @@ const styles = StyleSheet.create({
     zIndex: 2, // 텍스트가 채우기 색상 위에 오도록 설정
   },
   todayText: {
-    fontWeight: 'bold',
-    color: '#007AFF',
+    fontWeight: 'bold'
+  },
+  saturdayText: {
+    color: '#007AFF', // 파란색
+  },
+  sundayText: {
+    color: '#FF3B30', // 빨간색
   },
   todayMarker: {
     position: 'absolute',

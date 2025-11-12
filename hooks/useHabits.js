@@ -1,61 +1,93 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { addHabit as addHabitStorage, getHabits, updateHabit as updateHabitStorage, deleteHabit as deleteHabitStorage } from '../storage/habitStorage';
-import { formatISODate } from '../utils/dateUtils';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 const HabitsContext = createContext();
 
-// Provider는 앱 전체에서 습관 상태를 관리합니다.
-export function HabitsProvider({ children }) {
+const HABITS_STORAGE_KEY = 'app_habits';
+
+export const HabitsProvider = ({ children }) => {
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const h = await getHabits();
-      setHabits(h);
-      setLoading(false);
-    })();
+    const loadHabits = async () => {
+      try {
+        const savedHabits = await AsyncStorage.getItem(HABITS_STORAGE_KEY);
+        if (savedHabits) {
+          setHabits(JSON.parse(savedHabits));
+        }
+      } catch (e) {
+        console.error('Failed to load habits.', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadHabits();
   }, []);
 
-  // 새로운 습관 추가
-  async function addHabit(habit) {
-    const saved = await addHabitStorage(habit);
-    setHabits(prev => [...prev, saved]);
-    return saved;
-  }
+  const saveHabits = async (newHabits) => {
+    try {
+      await AsyncStorage.setItem(HABITS_STORAGE_KEY, JSON.stringify(newHabits));
+      setHabits(newHabits);
+    } catch (e) {
+      console.error('Failed to save habits.', e);
+    }
+  };
 
-  // 습관 업데이트
-  async function updateHabit(habit) {
-    const updated = await updateHabitStorage(habit);
-    setHabits(prev => prev.map(h => (h.id === habit.id ? updated : h)));
-    return updated;
-  }
+  const addHabit = async (habit) => {
+    const newHabit = { ...habit, id: uuidv4(), records: {} };
+    const newHabits = [...habits, newHabit];
+    await saveHabits(newHabits);
+  };
 
-  // 특정 날짜에 대한 완료 기록을 토글합니다.
-  async function toggleHabit(habitId, date) {
-    const h = habits.find(x => x.id === habitId);
-    if (!h) return;
-    const records = { ...(h.records || {}) };
-    records[date] = !records[date];
-    const updated = { ...h, records };
-    await updateHabitStorage(updated);
-    setHabits(prev => prev.map(item => (item.id === habitId ? updated : item)));
-    return updated;
-  }
+  const updateHabit = async (updatedHabit) => {
+    const newHabits = habits.map(h => (h.id === updatedHabit.id ? updatedHabit : h));
+    await saveHabits(newHabits);
+  };
 
-  // 습관 삭제
-  async function deleteHabit(id) {
-    await deleteHabitStorage(id);
-    setHabits(prev => prev.filter(h => h.id !== id));
-  }
+  const deleteHabit = async (habitId) => {
+    const newHabits = habits.filter(h => h.id !== habitId);
+    await saveHabits(newHabits);
+  };
+
+  const toggleHabit = async (habitId, date) => {
+    const newHabits = habits.map(habit => {
+      if (habit.id === habitId) {
+        const newRecords = { ...habit.records };
+        if (newRecords[date]) {
+          delete newRecords[date];
+        } else {
+          newRecords[date] = true;
+        }
+        return { ...habit, records: newRecords };
+      }
+      return habit;
+    });
+    await saveHabits(newHabits);
+  };
+
+  const reorderHabits = async (newOrder) => {
+    // newOrder is the full list of habits in the new order
+    await saveHabits(newOrder);
+  };
 
   return (
-    <HabitsContext.Provider value={{ habits, loading, addHabit, updateHabit, toggleHabit, deleteHabit }}>
+    <HabitsContext.Provider
+      value={{
+        habits,
+        loading,
+        addHabit,
+        updateHabit,
+        deleteHabit,
+        toggleHabit,
+        reorderHabits,
+      }}
+    >
       {children}
     </HabitsContext.Provider>
   );
-}
+};
 
-export function useHabits() {
-  return useContext(HabitsContext);
-}
+export const useHabits = () => useContext(HabitsContext);
