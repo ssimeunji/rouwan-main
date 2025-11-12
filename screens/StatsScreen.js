@@ -1,5 +1,6 @@
-import { Dimensions, SafeAreaView, ScrollView, Text, View, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, Text, View, StyleSheet } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHabits } from '../hooks/useHabits';
 import { weeklyCompletion } from '../utils/stats';
 import { useTheme } from '../context/ThemeContext';

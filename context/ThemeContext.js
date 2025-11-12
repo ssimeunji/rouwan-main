@@ -21,8 +21,8 @@ export const ThemeProvider = ({ children }) => {
         if (savedTheme && Object.values(THEMES).includes(savedTheme)) {
           setTheme(savedTheme);
         }
-      } catch (error) {
-        console.error('Failed to load theme', error);
+      } catch (e) {
+        console.error('Failed to load theme.', e);
       }
     };
     loadTheme();

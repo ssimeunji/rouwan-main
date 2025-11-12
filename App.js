@@ -1,25 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StatusBar } from 'expo-status-bar';
-import { ThemeProvider } from "./context/ThemeContext";
-import { HabitsProvider } from "./hooks/useHabits";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { HabitsProvider, useHabits } from "./hooks/useHabits";
 import AppNavigator from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
-  useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hideAsync();
-    }, 500);
-  }, []);
+function AppContent() {
+  const { loading: habitsLoading } = useHabits();
+  const { loading: themeLoading } = useTheme();
 
+  useEffect(() => {
+    if (!habitsLoading && !themeLoading) {
+      SplashScreen.hideAsync();
+    }
+  }, [habitsLoading, themeLoading]);
+
+  return <AppNavigator />;
+}
+
+export default function App() {
   return (
-    <ThemeProvider>
-      <HabitsProvider>
-        <AppNavigator />
-        <StatusBar style="auto" />
-      </HabitsProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <HabitsProvider>
+          <AppContent />
+          <StatusBar style="auto" />
+        </HabitsProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

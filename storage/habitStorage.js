@@ -1,52 +1,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const KEY = 'ROUWAN_HABITS_V1';
+const HABITS_KEY = 'habits';
 
-// 모든 습관을 가져옵니다.
 export async function getHabits() {
-  try {
-    const json = await AsyncStorage.getItem(KEY);
-    return json ? JSON.parse(json) : [];
-  } catch (e) {
-    console.error('getHabits error', e);
-    return [];
-  }
+  const habitsJson = await AsyncStorage.getItem(HABITS_KEY);
+  return habitsJson ? JSON.parse(habitsJson) : [];
 }
 
-// 전체를 덮어쓰기 저장합니다.
-export async function saveHabits(habits) {
-  try {
-    await AsyncStorage.setItem(KEY, JSON.stringify(habits));
-    return true;
-  } catch (e) {
-    console.error('saveHabits error', e);
-    return false;
-  }
-}
-
-// 습관 추가
 export async function addHabit(habit) {
   const habits = await getHabits();
-  habits.push(habit);
-  await saveHabits(habits);
+  const newHabits = [...habits, habit];
+  await AsyncStorage.setItem(HABITS_KEY, JSON.stringify(newHabits));
   return habit;
 }
 
-// 습관 업데이트(예: records 추가)
-export async function updateHabit(updated) {
+export async function updateHabit(updatedHabit) {
   const habits = await getHabits();
-  const idx = habits.findIndex(h => h.id === updated.id);
-  if (idx >= 0) {
-    habits[idx] = updated;
-    await saveHabits(habits);
-  }
-  return updated;
+  const newHabits = habits.map(h => (h.id === updatedHabit.id ? updatedHabit : h));
+  await AsyncStorage.setItem(HABITS_KEY, JSON.stringify(newHabits));
+  return updatedHabit;
 }
 
-// 습관 삭제
 export async function deleteHabit(id) {
   const habits = await getHabits();
-  const filtered = habits.filter(h => h.id !== id);
-  await saveHabits(filtered);
-  return filtered;
+  const newHabits = habits.filter(h => h.id !== id);
+  await AsyncStorage.setItem(HABITS_KEY, JSON.stringify(newHabits));
 }

@@ -1,4 +1,5 @@
-import { ActivityIndicator, FlatList, SafeAreaView, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import HabitItem from '../components/HabitItem';
 import { useHabits } from '../hooks/useHabits';
 import { formatISODate, getMonthDates } from '../utils/dateUtils';
@@ -6,7 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useState } from 'react';
 
 export default function HomeScreen() {
-  const { habits, loading } = useHabits();
+  const { habits, loading: habitsLoading, reorderHabits, toggleHabit, deleteHabit } = useHabits();
   const { theme } = useTheme();
   
   const today = new Date();
@@ -74,8 +75,11 @@ export default function HomeScreen() {
 
     return (
       <View key={item || `empty-${idx}`} style={styles.calendarDay}>
-        <TouchableOpacity onPress={() => item && setSelectedDate(item)} style={[styles.dayButton, isSelected && styles.selectedDay]}>
-          {completion > 0 && (
+        <TouchableOpacity 
+          onPress={() => item && setSelectedDate(item)} 
+          style={[styles.dayButton, isSelected && styles.selectedDay]}
+        >
+          {typeof completion === 'number' && completion >= 0 && (
             <View style={[
               styles.completionFill,
               { height: `${completion}%`, opacity: completion / 100 * 0.8 + 0.2, backgroundColor: theme }
@@ -90,7 +94,7 @@ export default function HomeScreen() {
     );
   };
 
-  if (loading) return <ActivityIndicator style={{flex:1}} />;
+  if (habitsLoading) return <ActivityIndicator style={{flex:1}} />;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -192,6 +196,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 999,
+    position: 'relative',
+    overflow: 'hidden',
   },
   selectedDay: {
     borderColor: '#333',
@@ -203,10 +209,12 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: 16,
-    zIndex: 1, // 텍스트가 채우기 색상 위에 오도록 설정
+    color: '#000', // 기본 텍스트 색상을 검은색으로 명시
+    zIndex: 2, // 텍스트가 채우기 색상 위에 오도록 설정
   },
   todayText: {
     fontWeight: 'bold',
+    color: '#007AFF',
   },
   todayMarker: {
     position: 'absolute',
@@ -217,6 +225,7 @@ const styles = StyleSheet.create({
   },
   habitSection: {
     flex: 1,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
@@ -229,12 +238,13 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: '#666',
-  }},
+  },
   completionFill: {
     position: 'absolute',
-    bottom: 0,
     left: 0,
     right: 0,
+    bottom: 0,
+    zIndex: 0,
     borderRadius: 999,
   },
 });
