@@ -5,21 +5,21 @@ import { useTheme } from '../context/ThemeContext';
 import WeekSelector from './WeekSelector';
 import { Picker } from '@react-native-picker/picker';
 
-const COLORS = ['#FFDDC1', '#FFABAB', '#FFC3A0', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', '#BDB2FF', '#FFADAD'];
-
 let DateTimePicker;
 if (Platform.OS === 'android') {
   DateTimePicker = require('@react-native-community/datetimepicker').default;
 }
 // 간단한 습관 추가 폼
+const COLORS = ['', '#FFDDC1', '#FFABAB', '#FFC3A0', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF'];
+
 export default function HabitForm({ onSubmit, habit: initialHabit }) {
   const [title, setTitle] = useState(initialHabit?.title || '');
   const [repeatMode, setRepeatMode] = useState('weekly'); // 'weekly', 'never', 'custom'
   const [repeatWeekly, setRepeatWeekly] = useState(true); // 매주 반복 여부
   const [endDate, setEndDate] = useState(initialHabit?.endDate ? new Date(initialHabit.endDate) : null); // 종료 날짜
   const [days, setDays] = useState(initialHabit?.days || []);
-  const [icon, setIcon] = useState(initialHabit?.icon || '💧');
-  const [color, setColor] = useState(initialHabit?.color || COLORS[0]);
+  const [icon, setIcon] = useState(initialHabit?.icon || '');
+  const [color, setColor] = useState(initialHabit?.color || '');
   const { theme } = useTheme();
 
   function handleSubmit() {
@@ -53,13 +53,6 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
     };
     onSubmit(habit);
   }
-
-
-  useEffect(() => {
-    if (repeatMode === 'weekly' && (days === null || days.length === 0)) {
-      setDays(['Mon','Tue','Wed','Thu','Fri']);
-    }
-  }, [repeatMode]);
 
 
 
@@ -103,12 +96,11 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
         {COLORS.map(c => (
           <TouchableOpacity
             key={c}
-            style={[
-              styles.colorOption,
-              { backgroundColor: c },
-              color === c && [styles.selectedColor, { borderColor: theme }],
-            ]}
+            style={[styles.colorOption,
+              c !== '' ? { backgroundColor: c } : styles.noColorOptionStyle,
+              color === c && [styles.selectedColor, { borderColor: theme }]]}
             onPress={() => setColor(c)}
+
           />
         ))}
       </View>
@@ -141,5 +133,16 @@ const styles = StyleSheet.create({
   },
   selectedColor: {
     borderWidth: 3,
+  },
+  noColorOptionStyle: {
+    backgroundColor: '#f0f0f0', // Light grey background for 'none'
+    borderWidth: 1,
+    borderColor: '#ccc', // Slightly darker border
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noColorText: {
+    fontSize: 18, // Make the '🚫' a bit larger
+    color: '#666',
   },
 });

@@ -1,13 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const ICONS = ['💧','🚶','🧘','📖','💤','🏋️'];
+const ICONS = ['','💧','🚶','🧘','📖','💤','🏋️'];
 
 export default function IconPicker({ value, onChange }) {
   return (
     <View style={styles.row}>
       {ICONS.map(ic => (
         <TouchableOpacity key={ic} style={[styles.item, value === ic ? styles.selected : null]} onPress={() => onChange(ic)}>
-          <Text style={styles.icon}>{ic}</Text>
+          <Text style={styles.icon}>{ic === '' ? '🚫' : ic}</Text>
         </TouchableOpacity>
       ))}
     </View>
