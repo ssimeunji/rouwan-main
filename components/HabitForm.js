@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity, Switch, Platform } from 'react-native';
 import IconPicker from './IconPicker';
 import { useTheme } from '../context/ThemeContext';
@@ -17,41 +17,74 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
   const [repeatMode, setRepeatMode] = useState('weekly'); // 'weekly', 'never', 'custom'
   const [repeatWeekly, setRepeatWeekly] = useState(true); // 매주 반복 여부
   const [endDate, setEndDate] = useState(initialHabit?.endDate ? new Date(initialHabit.endDate) : null); // 종료 날짜
-  const [days, setDays] = useState(initialHabit?.days || ['Mon','Tue','Wed','Thu','Fri']);
+  const [days, setDays] = useState(initialHabit?.days || []);
   const [icon, setIcon] = useState(initialHabit?.icon || '💧');
   const [color, setColor] = useState(initialHabit?.color || COLORS[0]);
   const { theme } = useTheme();
 
   function handleSubmit() {
     if (!title.trim()) return;
+
+    let habitStartDate = new Date().toISOString().split('T')[0];
+    let habitEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
+
+    if (repeatMode === 'never') {
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, etc.
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - dayOfWeek);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+      habitStartDate = startOfWeek.toISOString().split('T')[0];
+      habitEndDate = endOfWeek.toISOString().split('T')[0];
+    }
+
     const habit = {
       id: initialHabit?.id || String(Date.now()), // Date.now()를 사용하여 임시 ID 생성
-      repeatMode,
-      repeatWeekly,
-      endDate: endDate ? endDate.toISOString().split('T')[0] : null, // ISO 형식으로 변환하여 저장
       title: title.trim(),
-      startDate: new Date().toISOString().split('T')[0], // 습관 시작 날짜를 현재 날짜로 설정
-
       days,
       icon,
       color,
       records: initialHabit?.records || {},
+      repeatMode,
+      startDate: habitStartDate,
+      endDate: habitEndDate,
     };
     onSubmit(habit);
   }
 
 
+  useEffect(() => {
+    if (repeatMode === 'weekly' && (days === null || days.length === 0)) {
+      setDays(['Mon','Tue','Wed','Thu','Fri']);
+    }
+  }, [repeatMode]);
+
+
+
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>제목</Text>
-      <TextInput value={title} onChangeText={setTitle} style={styles.input} placeholder="예: 물 2L 마시기" />
+      <TextInput
+        value={title}
+        onChangeText={setTitle}
+        style={styles.input}
+        placeholder="예: 물 2L 마시기"
+        keyboardType="default"
+        autoCapitalize="none"
+        autoCorrect={false}
+        // ensure IME composition works on Android
+      />
       <Text style={styles.label}>요일</Text>
       <WeekSelector value={days} onChange={setDays} />
       <View style={styles.repeatContainer}>
         <Text style={styles.label}>반복 모드</Text>
         <Picker
           selectedValue={repeatMode}
-          style={{ height: 50, width: 150 }}
+          style={{ height: 60, width: 150 }}
           onValueChange={(itemValue, itemIndex) => setRepeatMode(itemValue)}
         >
           <Picker.Item label="매주 반복" value="weekly" />
@@ -59,7 +92,6 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
           <Picker.Item label="기간 설정" value="custom" />
         </Picker>
       </View>
-      <Text style={styles.label}>종료 날짜 (선택 사항)</Text>
 
 
 
