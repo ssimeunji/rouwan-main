@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DAYS_KO = ['일','월','화','수','목','금','토'];
 
 export default function WeekSelector({ value = [], onChange }) {
   function toggle(day) {
@@ -11,9 +12,9 @@ export default function WeekSelector({ value = [], onChange }) {
 
   return (
     <View style={styles.row}>
-      {DAYS.map(d => (
+      {DAYS.map((d, index) => (
         <TouchableOpacity key={d} onPress={() => toggle(d)} style={[styles.chip, value.includes(d) ? styles.active : {}]}>
-          <Text style={value.includes(d) ? styles.activeText : {}}>{d}</Text>
+          <Text style={[styles.chipText, value.includes(d) ? styles.activeText : {}]}>{DAYS_KO[index]}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -21,8 +22,11 @@ export default function WeekSelector({ value = [], onChange }) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', flexWrap: 'wrap' },
-  chip: { padding: 8, margin: 4, borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
+  row: { flexDirection: 'row', marginVertical: 4 },
+  chip: { flex: 1, paddingVertical: 10, marginHorizontal: 2, borderRadius: 8, borderWidth: 1, borderColor: '#ddd', alignItems: 'center', justifyContent: 'center' },
   active: { backgroundColor: '#4caf50', borderColor: '#4caf50' },
-  activeText: { color: '#fff' }
+  chipText: {
+    fontSize: 14,
+  },
+  activeText: { color: '#fff' },
 });
