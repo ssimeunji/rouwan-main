@@ -19,7 +19,7 @@ export default function AppNavigator() {
           name="Home"
           component={HomeScreen}
           options={({ navigation }) => ({
-            title: '오늘의 습관',
+            title: '오늘의 할일',
             headerRight: () => (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Add')} style={{ marginRight: 15 }}>

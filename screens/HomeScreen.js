@@ -128,13 +128,13 @@ export default function HomeScreen() {
         <View>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={prevMonth} style={styles.navButton}>
-              <Text style={[styles.navText, { color: theme }]}>{'‹'}</Text>
+              <Text style={styles.navText}>{'‹'}</Text>
             </TouchableOpacity>
             <Text style={styles.monthTitle}>
               {selectedMonthDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' })}
             </Text>
             <TouchableOpacity onPress={nextMonth} style={styles.navButton}>
-              <Text style={[styles.navText, { color: theme }]}>{'›'}</Text>
+              <Text style={styles.navText}>{'›'}</Text>
             </TouchableOpacity>
           </View>
 
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 22,
+    color: '#007AFF',
   },
   weekHeader: {
     flexDirection: 'row',

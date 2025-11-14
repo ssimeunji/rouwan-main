@@ -14,7 +14,7 @@ const COLORS = ['', '#FFDDC1', '#FFABAB', '#FFC3A0', '#FFD6A5', '#FDFFB6', '#CAF
 
 export default function HabitForm({ onSubmit, habit: initialHabit }) {
   const [title, setTitle] = useState(initialHabit?.title || '');
-  const [repeatMode, setRepeatMode] = useState('weekly'); // 'weekly', 'never', 'custom'
+  const [repeatMode, setRepeatMode] = useState(initialHabit?.repeatMode || 'weekly'); // 'weekly', 'never', 'custom'
   const [repeatWeekly, setRepeatWeekly] = useState(true); // 매주 반복 여부
   const [endDate, setEndDate] = useState(initialHabit?.endDate ? new Date(initialHabit.endDate) : null); // 종료 날짜
   const [days, setDays] = useState(initialHabit?.days || []);
