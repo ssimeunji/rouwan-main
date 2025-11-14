@@ -35,8 +35,8 @@ export default function AppNavigator() {
             ),
           })}
         />
-        <Stack.Screen name="Add" component={AddHabitScreen} options={{ title: '습관 추가' }} />
-        <Stack.Screen name="Edit" component={EditHabitScreen} options={{ title: '습관 수정' }} />
+        <Stack.Screen name="Add" component={AddHabitScreen} options={{ title: '할일 추가' }} />
+        <Stack.Screen name="Edit" component={EditHabitScreen} options={{ title: '할일 수정' }} />
         <Stack.Screen name="Stats" component={StatsScreen} options={{ title: '통계' }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: '설정' }} />
       </Stack.Navigator>

@@ -2,6 +2,13 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useHabits } from '../hooks/useHabits';
 import { useNavigation } from '@react-navigation/native';
 
+const dayMap = {
+  Sun: '일', Mon: '월', Tue: '화', Wed: '수', Thu: '목', Fri: '금', Sat: '토'
+};
+
+const toKoreanDays = (days) => {
+  return days.map(day => dayMap[day] || day).join(', ');
+};
 export default function HabitItem({ habit, date }) {
   const { toggleHabit, deleteHabit } = useHabits();
   const navigation = useNavigation();
@@ -29,7 +36,7 @@ export default function HabitItem({ habit, date }) {
       <View style={[styles.row, { backgroundColor: habit.color || '#fff' }]}>
         <View style={styles.left}>
           <Text style={styles.title}>{habit.icon} {habit.title}</Text>
-          <Text style={styles.days}>{habit.days.join(', ')}</Text>
+          <Text style={styles.days}>{toKoreanDays(habit.days)}</Text>
         </View>
         <TouchableOpacity
           accessibilityLabel={`toggle-${habit.id}`}
