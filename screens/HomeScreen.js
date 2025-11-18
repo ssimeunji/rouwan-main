@@ -102,7 +102,7 @@ export default function HomeScreen() {
           style={[
             styles.dayButton,
             isSelected && styles.selectedDay,
-            isToday && { borderColor: theme, borderWidth: 2 }
+            isToday && { borderColor: shadeColor(theme, -20), borderWidth: 2 }
           ]}
         >
           {typeof completion === 'number' && completion >= 0 && (
@@ -288,3 +288,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
 });
+
+// Function to darken a color
+function shadeColor(color, percent) {
+  let R = parseInt(color.substring(1,3),16);
+  let G = parseInt(color.substring(3,5),16);
+  let B = parseInt(color.substring(5,7),16);
+  R = parseInt(String(R * (100 + percent) / 100));G = parseInt(String(G * (100 + percent) / 100));B = parseInt(String(B * (100 + percent) / 100));
+  R = (R<255)?R:255;  G = (G<255)?G:255;  B = (B<255)?B:255;  let RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));  let GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));  let BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+  return "#"+RR+GG+BB;}
