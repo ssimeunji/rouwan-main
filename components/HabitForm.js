@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity, Switch, Platform } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity, Platform } from 'react-native';
 import IconPicker from './IconPicker';
 import { useTheme } from '../context/ThemeContext';
 import WeekSelector from './WeekSelector';
@@ -7,25 +7,59 @@ import { Picker } from '@react-native-picker/picker';
 
 let DateTimePicker;
 if (Platform.OS === 'android') {
-  DateTimePicker = require('@react-native-community/datetimepicker').default;
+  DateTimePicker = require('@react-native-community/datetimepicker').DateTimePickerAndroid;
 }
 // 간단한 습관 추가 폼
 const COLORS = ['', '#FFDDC1', '#FFABAB', '#FFC3A0', '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF'];
 
 export default function HabitForm({ onSubmit, habit: initialHabit }) {
   const [title, setTitle] = useState(initialHabit?.title || '');
-  const [repeatMode, setRepeatMode] = useState(initialHabit?.repeatMode || 'weekly'); // 'weekly', 'never', 'custom'
-  const [repeatWeekly, setRepeatWeekly] = useState(true); // 매주 반복 여부
+  const [repeatMode, setRepeatMode] = useState(initialHabit?.repeatMode || 'weekly');
+  const [startDate, setStartDate] = useState(initialHabit?.startDate ? new Date(initialHabit.startDate) : new Date());
   const [endDate, setEndDate] = useState(initialHabit?.endDate ? new Date(initialHabit.endDate) : null); // 종료 날짜
   const [days, setDays] = useState(initialHabit?.days || []);
   const [icon, setIcon] = useState(initialHabit?.icon || '');
   const [color, setColor] = useState(initialHabit?.color || '');
   const { theme } = useTheme();
 
+  const showDatePicker = (currentValue, setter) => {
+    DateTimePicker.open({
+      value: currentValue || new Date(),
+      onChange: (event, selectedDate) => {
+        if (selectedDate) {
+          setter(selectedDate);
+        }
+      },
+      mode: 'date',
+    });
+  };
+
+  const onStartDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || startDate;
+    setStartDate(currentDate);
+  };
+
+  const onEndDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || endDate;
+    setEndDate(currentDate);
+  };
+
+  const showAndroidDatePicker = (currentValue, onChange) => {
+    DateTimePicker.open({
+      value: currentValue,
+      onChange: (event, selectedDate) => {
+        if (selectedDate) {
+          onChange(event, selectedDate);
+        }
+      },
+      mode: 'date',
+    });
+  };
+
   function handleSubmit() {
     if (!title.trim()) return;
 
-    let habitStartDate = new Date().toISOString().split('T')[0];
+    let habitStartDate = startDate.toISOString().split('T')[0];
     let habitEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
 
     if (repeatMode === 'never') {
@@ -85,6 +119,22 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
           <Picker.Item label="기간 설정" value="custom" />
         </Picker>
       </View>
+      {repeatMode === 'custom' && (
+        <View style={styles.dateRangeContainer}>
+          <TouchableOpacity onPress={() => showDatePicker(startDate, setStartDate)} style={styles.datePickerButton}>
+            <Text style={styles.datePickerText}>
+              시작: {startDate.toLocaleDateString('ko-KR')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => showDatePicker(endDate || new Date(), setEndDate)} style={styles.datePickerButton}>
+            <Text style={styles.datePickerText}>
+              종료: {endDate ? endDate.toLocaleDateString('ko-KR') : '선택 안함'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+
 
 
 
@@ -104,7 +154,7 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
           />
         ))}
       </View>
-      <Button title="추가" onPress={handleSubmit} />
+      <Button title="등록" onPress={handleSubmit} />
 
     </View>
   );
@@ -118,6 +168,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  dateRangeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginVertical: 8,
+  },
+  datePickerButton: {
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  datePickerText: {
+    fontSize: 16,
   },
   colorsContainer: {
     flexDirection: 'row',

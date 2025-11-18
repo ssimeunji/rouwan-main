@@ -19,7 +19,7 @@ export default function AppNavigator() {
           name="Home"
           component={HomeScreen}
           options={({ navigation }) => ({
-            title: '오늘의 할일',
+            title: '오늘의 할 일',
             headerRight: () => (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Add')} style={{ marginRight: 15 }}>
@@ -35,8 +35,8 @@ export default function AppNavigator() {
             ),
           })}
         />
-        <Stack.Screen name="Add" component={AddHabitScreen} options={{ title: '할일 추가' }} />
-        <Stack.Screen name="Edit" component={EditHabitScreen} options={{ title: '할일 수정' }} />
+        <Stack.Screen name="Add" component={AddHabitScreen} options={{ title: '할 일 추가' }} />
+        <Stack.Screen name="Edit" component={EditHabitScreen} options={{ title: '할 일 수정' }} />
         <Stack.Screen name="Stats" component={StatsScreen} options={{ title: '통계' }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ title: '설정' }} />
       </Stack.Navigator>

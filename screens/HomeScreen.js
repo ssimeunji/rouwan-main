@@ -162,7 +162,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.habitSection}>
-          <Text style={styles.sectionTitle}>{new Date(selectedDate).toLocaleDateString('ko-KR')}의 할일</Text>
+          <Text style={styles.sectionTitle}>{new Date(selectedDate).toLocaleDateString('ko-KR')}의 할 일</Text>
           <FlatList
             data={habitsForSelectedDay}
             keyExtractor={item => item.id}

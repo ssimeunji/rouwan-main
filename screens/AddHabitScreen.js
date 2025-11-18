@@ -9,7 +9,7 @@ export default function AddHabitScreen({ navigation }) {
   async function handleSubmit(habit) {
     if (!habit) return;
     await addHabit(habit);
-    Alert.alert('완료', '할일이 추가되었습니다.');
+    Alert.alert('완료', '할 일이 추가되었습니다.');
     navigation.goBack();
   }
 
