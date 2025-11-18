@@ -50,7 +50,13 @@ export default function HomeScreen() {
     if (!isoDate) return acc;
 
     const dayName = new Date(isoDate).toLocaleString('en-US', { weekday: 'short' });
-    const habitsForDay = habits.filter(h => h.days.includes(dayName));
+    const habitsForDay = habits.filter(h => {
+      if (!h.days.includes(dayName)) return false;
+      // 시작 날짜와 종료 날짜를 확인하여 해당 기간에만 습관을 포함
+      if (h.startDate && isoDate < h.startDate) return false;
+      if (h.endDate && isoDate > h.endDate) return false;
+      return true;
+    });
 
     if (habitsForDay.length === 0) {
       acc[isoDate] = -1; // 습관 없는 날
