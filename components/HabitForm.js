@@ -72,6 +72,8 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
 
       habitStartDate = startOfWeek.toISOString().split('T')[0];
       habitEndDate = endOfWeek.toISOString().split('T')[0];
+    } else if (repeatMode === 'weekly') {
+      habitEndDate = null;
     }
 
     const habit = {
