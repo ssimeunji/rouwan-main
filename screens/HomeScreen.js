@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 export default function HomeScreen() {
   const { habits, loading: habitsLoading, reorderHabits, toggleHabit, deleteHabit } = useHabits();
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   
   const today = new Date();
   const todayISO = formatISODate(today);
@@ -129,14 +129,14 @@ export default function HomeScreen() {
   if (habitsLoading) return <ActivityIndicator style={{flex:1}} />;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={[{ flex: 1 }, isDarkMode && styles.darkContainer]}>
+      <ScrollView contentContainerStyle={[styles.container, isDarkMode && styles.darkContainer]}>
         <View>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={prevMonth} style={styles.navButton}>
               <Text style={styles.navText}>{'‹'}</Text>
             </TouchableOpacity>
-            <Text style={styles.monthTitle}>
+            <Text style={[styles.monthTitle, isDarkMode && styles.darkText]}>
               {selectedMonthDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' })}
             </Text>
             <TouchableOpacity onPress={nextMonth} style={styles.navButton}>
@@ -151,25 +151,26 @@ export default function HomeScreen() {
                 key={w}
                 style={[
                   styles.weekHeaderText,
+                  isDarkMode && styles.darkWeekHeaderText,
                   index === 0 && styles.sundayText, // '일'요일 (index 0)
                   index === 6 && styles.saturdayText, // '토'요일 (index 6)
                 ]}>{w}</Text>
             ))}
           </View>
 
-          <View style={styles.calendar}>
+          <View style={[styles.calendar, isDarkMode && styles.darkCalendar]}>
             {monthGrid.map((it, idx) => renderCalendarDay(it, idx))}
           </View>
         </View>
         <View style={styles.habitSection}>
-          <Text style={styles.sectionTitle}>{new Date(selectedDate).toLocaleDateString('ko-KR')}의 할 일</Text>
+          <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{new Date(selectedDate).toLocaleDateString('ko-KR')}의 할 일</Text>
           <FlatList
             data={habitsForSelectedDay}
             keyExtractor={item => item.id}
             renderItem={({item}) => <HabitItem habit={item} date={selectedDate} />}
             scrollEnabled={false}
             ListEmptyComponent={
-              <View style={[styles.emptyContainer, { backgroundColor: '#fff' }]}>
+              <View style={[styles.emptyContainer, isDarkMode ? styles.darkRow : { backgroundColor: '#fff' }]}>
                 <Text style={styles.emptyText}>오늘의 습관이 없습니다.</Text>
               </View>
             }
@@ -185,10 +186,16 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     padding: 16,
   },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
   monthTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+  },
+  darkText: {
+    color: '#FFFFFF',
   },
   headerRow: {
     flexDirection: 'row',
@@ -215,6 +222,9 @@ const styles = StyleSheet.create({
     color: '#666',
     fontWeight: '600',
   },
+  darkWeekHeaderText: {
+    color: '#A0A0A0',
+  },
   calendar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -222,6 +232,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
     paddingVertical: 10,
+  },
+  darkCalendar: {
+    backgroundColor: '#1E1E1E',
   },
   calendarDay: {
     width: '14.28%',
@@ -270,6 +283,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 16,
+  },
+  darkRow: {
+    backgroundColor: '#1E1E1E',
   },
   emptyContainer: {
     padding: 16,

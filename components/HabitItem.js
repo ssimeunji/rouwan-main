@@ -1,6 +1,7 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useHabits } from '../hooks/useHabits';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 const dayMap = {
   Sun: '일', Mon: '월', Tue: '화', Wed: '수', Thu: '목', Fri: '금', Sat: '토'
@@ -12,6 +13,7 @@ const toKoreanDays = (days) => {
 export default function HabitItem({ habit, date }) {
   const { toggleHabit, deleteHabit } = useHabits();
   const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
   const done = habit.records && habit.records[date];
 
   function handleLongPress() {
@@ -33,9 +35,13 @@ export default function HabitItem({ habit, date }) {
       delayLongPress={500}
       activeOpacity={0.7}
     >
-      <View style={[styles.row, { backgroundColor: habit.color || '#fff' }]}>
+      <View style={[
+        styles.row,
+        isDarkMode ? styles.darkRow : { backgroundColor: '#fff' },
+        habit.color ? { backgroundColor: habit.color } : {}
+      ]}>
         <View style={styles.left}>
-          <Text style={styles.title}>{habit.icon} {habit.title}</Text>
+          <Text style={[styles.title, isDarkMode && !habit.color && styles.darkText]}>{habit.icon} {habit.title}</Text>
           <Text style={styles.days}>{toKoreanDays(habit.days)}</Text>
         </View>
         <TouchableOpacity
@@ -52,8 +58,14 @@ export default function HabitItem({ habit, date }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 8, marginBottom: 8 },
+  darkRow: {
+    backgroundColor: '#1E1E1E',
+  },
   left: { flex: 1 },
   title: { fontSize: 16, fontWeight: '600' },
+  darkText: {
+    color: '#FFFFFF',
+  },
   days: { color: '#666', marginTop: 4 },
   check: { padding: 10, borderRadius: 8 },
   checked: { backgroundColor: '#4caf50' },

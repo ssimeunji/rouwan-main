@@ -14,7 +14,7 @@ export default function SettingsScreen() {
   const [enabled, setEnabled] = useState(false);
   const [time, setTime] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const { theme, changeTheme, themes } = useTheme();
+  const { theme, changeTheme, themes, isDarkMode, toggleDarkMode } = useTheme();
 
   useEffect(() => {
     // 저장된 알림 설정 불러오기
@@ -81,11 +81,11 @@ export default function SettingsScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.sectionTitle}>알림</Text>
-      <View style={styles.row}>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+      <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>알림</Text>
+      <View style={[styles.row, isDarkMode && styles.darkRow]}>
         <TouchableOpacity onPress={showTimepicker}>
-          <Text style={styles.rowLabel}>매일 알림 ({time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })})</Text>
+          <Text style={[styles.rowLabel, isDarkMode && styles.darkText]}>매일 알림 ({time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })})</Text>
         </TouchableOpacity>
         <Switch value={enabled} onValueChange={toggle} />
       </View>
@@ -99,8 +99,20 @@ export default function SettingsScreen() {
         />
       )}
 
-      <Text style={[styles.sectionTitle, { marginTop: 24 }]}>테마 색상</Text>
-      <View style={styles.colorsContainer}>
+      <Text style={[styles.sectionTitle, { marginTop: 24 }, isDarkMode && styles.darkText]}>모드</Text>
+      <View style={[styles.row, isDarkMode && styles.darkRow]}>
+        <Text style={[styles.rowLabel, isDarkMode && styles.darkText]}>다크 모드</Text>
+        <Switch
+          trackColor={{ false: "#767577", true: theme }}
+          thumbColor={isDarkMode ? "#f4f3f4" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          value={isDarkMode} // The value is controlled by the context's state
+          onValueChange={toggleDarkMode}
+        />
+      </View>
+
+      <Text style={[styles.sectionTitle, { marginTop: 24 }, isDarkMode && styles.darkText]}>테마 색상</Text>
+      <View style={[styles.colorsContainer, isDarkMode && styles.darkRow]}>
         {Object.entries(themes).map(([name, color]) => (
           <TouchableOpacity
             key={name}
@@ -122,10 +134,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
+  },
+  darkText: {
+    color: '#FFFFFF',
   },
   row: {
     flexDirection: 'row',
@@ -135,6 +153,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 16,
     borderRadius: 8,
+  },
+  darkRow: {
+    backgroundColor: '#1E1E1E',
   },
   rowLabel: {
     fontSize: 16,
