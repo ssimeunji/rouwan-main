@@ -32,7 +32,7 @@ export default function SettingsScreen() {
       }
     }
     loadSettings();
-  }, []);
+  }, [isDarkMode]);
 
   async function saveSettings(newEnabled, newTime) {
     const settings = { enabled: newEnabled, time: newTime.toISOString() };

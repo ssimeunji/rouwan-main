@@ -1,9 +1,11 @@
 import { Alert, View } from 'react-native';
 import HabitForm from '../components/HabitForm';
 import { useHabits } from '../hooks/useHabits';
+import { useTheme } from '../context/ThemeContext';
 
 export default function EditHabitScreen({ navigation, route }) {
   const { updateHabit } = useHabits();
+  const { isDarkMode } = useTheme();
   const { habit } = route.params;
 
   async function handleSubmit(updatedHabit) {
@@ -14,7 +16,7 @@ export default function EditHabitScreen({ navigation, route }) {
   }
 
   return (
-    <View style={{flex:1}}>
+    <View style={[{ flex: 1 }, isDarkMode && { backgroundColor: '#121212' }]}>
       <HabitForm onSubmit={handleSubmit} habit={habit} />
     </View>
   );

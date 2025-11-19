@@ -20,7 +20,7 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
   const [days, setDays] = useState(initialHabit?.days || []);
   const [icon, setIcon] = useState(initialHabit?.icon || '');
   const [color, setColor] = useState(initialHabit?.color || '');
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   const showDatePicker = (currentValue, setter) => {
     DateTimePicker.open({
@@ -95,22 +95,23 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>제목</Text>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+      <Text style={[styles.label, isDarkMode && styles.darkText]}>제목</Text>
       <TextInput
         value={title}
         onChangeText={setTitle}
-        style={styles.input}
+        style={[styles.input, isDarkMode && styles.darkInput]}
         placeholder="예: 물 2L 마시기"
+        placeholderTextColor={isDarkMode ? '#888' : '#ccc'}
         keyboardType="default"
         autoCapitalize="none"
         autoCorrect={false}
         // ensure IME composition works on Android
       />
-      <Text style={styles.label}>요일</Text>
+      <Text style={[styles.label, isDarkMode && styles.darkText]}>요일</Text>
       <WeekSelector value={days} onChange={setDays} />
       <View style={styles.repeatContainer}>
-        <Text style={styles.label}>반복 모드</Text>
+        <Text style={[styles.label, isDarkMode && styles.darkText]}>반복 모드</Text>
         <Picker
           selectedValue={repeatMode}
           style={{ height: 60, width: 150 }}
@@ -163,9 +164,23 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  label: { marginTop: 8, marginBottom: 4, fontWeight: '600' },
-  input: { borderWidth: 1, borderColor: '#ddd', padding: 8, borderRadius: 6 },
+  container: { padding: 16, flex: 1 },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
+  label: { marginTop: 8, marginBottom: 4, fontWeight: '600', color: '#000' },
+  darkText: {
+    color: '#fff',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+  darkInput: { borderColor: '#555', backgroundColor: '#333', color: '#fff' },
   repeatContainer: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -182,6 +197,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+  },
+  darkDatePickerButton: {
+    backgroundColor: '#333',
   },
   datePickerText: {
     fontSize: 16,
