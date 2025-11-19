@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { cancelAllReminders, requestPermissionsAsync, scheduleDailyReminder } from '../hooks/useNotifications';
 let DateTimePicker;
 let DateTimePickerAndroid;
-if (Platform.OS === 'android') {
+if (Platform.OS === 'android') { 
   DateTimePicker = require('@react-native-community/datetimepicker').default;
   DateTimePickerAndroid = require('@react-native-community/datetimepicker').DateTimePickerAndroid;
 }
@@ -80,6 +80,7 @@ export default function SettingsScreen() {
     }
   }
 
+
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>알림</Text>
@@ -112,7 +113,7 @@ export default function SettingsScreen() {
       </View>
 
       <Text style={[styles.sectionTitle, { marginTop: 24 }, isDarkMode && styles.darkText]}>테마 색상</Text>
-      <View style={[styles.colorsContainer, isDarkMode && styles.darkRow]}>
+      <View style={[styles.colorsContainer, isDarkMode && styles.darkRow ]}>
         {Object.entries(themes).map(([name, color]) => (
           <TouchableOpacity
             key={name}
@@ -123,6 +124,7 @@ export default function SettingsScreen() {
             ]}
             onPress={() => changeTheme(color)}
           />
+
         ))}
       </View>
     </View>
