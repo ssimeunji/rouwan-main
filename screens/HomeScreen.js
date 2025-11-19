@@ -113,6 +113,8 @@ export default function HomeScreen() {
           )}
           <Text style={[
             styles.dayText,
+            isDarkMode && completion === -1 && !isSaturday && !isSunday && { color: '#888' }, // 다크모드, 할일없는 평일
+            isDarkMode && { color: '#fff' }, // 다크 모드일 때 텍스트 색상 변경
             isSelected && styles.selectedDayText,
             isToday && styles.todayText,
             isSaturday && styles.saturdayText,
