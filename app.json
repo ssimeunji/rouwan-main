@@ -10,6 +10,11 @@
     ],
     "android": {
       "package": "com.anonymous.rouwan"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d7ff9aa2-393a-4484-b20f-8788ae85cfaf"
+      }
     }
   }
 }
