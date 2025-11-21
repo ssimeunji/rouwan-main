@@ -114,12 +114,13 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
         <Text style={[styles.label, isDarkMode && styles.darkText]}>반복 모드</Text>
         <Picker
           selectedValue={repeatMode}
-          style={{ height: 60, width: 150 }}
+          style={[styles.picker, isDarkMode && styles.darkPicker]}
           onValueChange={(itemValue, itemIndex) => setRepeatMode(itemValue)}
+          itemStyle={isDarkMode ? { color: 'white' } : { color: 'black' }}
         >
-          <Picker.Item label="매주 반복" value="weekly" />
-          <Picker.Item label="반복 안함" value="never" />
-          <Picker.Item label="기간 설정" value="custom" />
+          <Picker.Item label="매주 반복" value="weekly" color={isDarkMode ? 'white' : 'black'} />
+          <Picker.Item label="반복 안함" value="never" color={isDarkMode ? 'white' : 'black'} />
+          <Picker.Item label="기간 설정" value="custom" color={isDarkMode ? 'white' : 'black'} />
         </Picker>
       </View>
       {repeatMode === 'custom' && (
@@ -142,15 +143,15 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
 
 
 
-      <Text style={styles.label}>아이콘</Text>
+      <Text style={[styles.label, isDarkMode && styles.darkText]}>아이콘</Text>
       <IconPicker value={icon} onChange={setIcon} />
-      <Text style={styles.label}>색상</Text>
+      <Text style={[styles.label, isDarkMode && styles.darkText]}>색상</Text>
       <View style={styles.colorsContainer}>
         {COLORS.map(c => (
           <TouchableOpacity
             key={c}
             style={[styles.colorOption,
-              c !== '' ? { backgroundColor: c } : styles.noColorOptionStyle,
+              c !== '' ? { backgroundColor: c } : (isDarkMode ? styles.darkNoColorOptionStyle : styles.noColorOptionStyle),
               color === c && [styles.selectedColor, { borderColor: theme }]]}
             onPress={() => setColor(c)}
 
@@ -185,6 +186,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  picker: {
+    height: 60,
+    width: 150,
+  },
+  darkPicker: {
+    color: '#fff',
+    backgroundColor: '#333', // iOS 피커 배경색에 영향을 줄 수 있습니다.
   },
   dateRangeContainer: {
     flexDirection: 'row',
@@ -223,6 +232,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0', // Light grey background for 'none'
     borderWidth: 1,
     borderColor: '#ccc', // Slightly darker border
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  darkNoColorOptionStyle: {
+    backgroundColor: '#555',
+    borderWidth: 1,
+    borderColor: '#888',
     justifyContent: 'center',
     alignItems: 'center',
   },
