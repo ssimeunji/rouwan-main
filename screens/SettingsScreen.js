@@ -122,7 +122,7 @@ export default function SettingsScreen() {
               { backgroundColor: color },
               theme === color && styles.selectedColor,
             ]}
-            onPress={() => changeTheme(color)}
+            onPress={() => changeTheme(name)}
           />
 
         ))}

@@ -109,7 +109,7 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
         // ensure IME composition works on Android
       />
       <Text style={[styles.label, isDarkMode && styles.darkText]}>요일</Text>
-      <WeekSelector value={days} onChange={setDays} />
+      <WeekSelector value={days} onChange={setDays}/>
       <View style={styles.repeatContainer}>
         <Text style={[styles.label, isDarkMode && styles.darkText]}>반복 모드</Text>
         <Picker
@@ -151,8 +151,8 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
           <TouchableOpacity
             key={c}
             style={[styles.colorOption,
-              c !== '' ? { backgroundColor: c } : (isDarkMode ? styles.darkNoColorOptionStyle : styles.noColorOptionStyle),
-              color === c && [styles.selectedColor, { borderColor: theme }]]}
+              c !== '' ? { backgroundColor: c } : (isDarkMode ? styles.darkNoColorOptionStyle : styles.noColorOptionStyle), ,
+              color === c && [styles.selectedColor, { borderColor: theme || '#007bff' }]]}
             onPress={() => setColor(c)}
 
           />
