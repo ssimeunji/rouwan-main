@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HabitItem from '../components/HabitItem';
 import { useHabits } from '../hooks/useHabits';
@@ -132,6 +132,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[{ flex: 1 }, isDarkMode && styles.darkContainer]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentContainerStyle={[styles.container, isDarkMode && styles.darkContainer]}>
         <View>
           <View style={styles.headerRow}>

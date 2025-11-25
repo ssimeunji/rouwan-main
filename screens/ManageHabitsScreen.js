@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { useHabits } from '../hooks/useHabits';
 import HabitItem from '../components/HabitItem';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ManageHabitsScreen() {
-  const { habits, reorderHabits } = useHabits();
+  const { habits, reorderHabits } = useHabits(); 
+  const { isDarkMode } = useTheme();
 
   const renderItem = ({ item, drag, isActive }) => {
     return (
@@ -16,7 +18,8 @@ export default function ManageHabitsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, isDarkMode && styles.darkContainer]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <View style={styles.header}>
         <Text style={styles.title}>습관 순서 변경</Text>
       </View>
@@ -34,6 +37,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
   },
   header: {
     marginBottom: 20,

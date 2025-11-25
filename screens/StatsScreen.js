@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, Text, View, StyleSheet } from 'react-native';
+import { Dimensions, ScrollView, Text, View, StyleSheet, StatusBar } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHabits } from '../hooks/useHabits';
@@ -9,7 +9,7 @@ const { width } = Dimensions.get('window');
 
 export default function StatsScreen() {
   const { habits } = useHabits();
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const weekly = weeklyCompletion(habits);
 
   // 월별 달성률 계산 (지난 6개월)
@@ -63,39 +63,40 @@ export default function StatsScreen() {
   const data = weekly.map(w => w.percent);
 
   return (
-    <SafeAreaView style={{flex:1}}>
-      <ScrollView contentContainerStyle={{padding:16}}>
-        <Text style={{fontSize:18,fontWeight:'700'}}>주간 달성률</Text>
+    <SafeAreaView style={[{flex:1}, isDarkMode && styles.darkContainer]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={[styles.title, isDarkMode && styles.darkText]}>주간 달성률</Text>
         <LineChart
           data={{ labels, datasets: [{ data }] }}
           width={width - 32}
           height={220}
           yAxisSuffix="%"
           chartConfig={{
-            backgroundColor: '#fff',
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#fff',
+            backgroundGradientFrom: isDarkMode ? '#1E1E1E' : '#fff',
+            backgroundGradientTo: isDarkMode ? '#1E1E1E' : '#fff',
             decimalPlaces: 0,
             color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0,0,0, ${opacity})`,
+            labelColor: (opacity = 1) => isDarkMode ? `rgba(255,255,255, ${opacity})` : `rgba(0,0,0, ${opacity})`,
           }}
           bezier
           style={{ marginVertical: 8, borderRadius: 16 }}
         />
 
-        <Text style={{fontSize:18,fontWeight:'700', marginTop: 24}}>월간 달성률</Text>
+        <Text style={[styles.title, { marginTop: 24 }, isDarkMode && styles.darkText]}>월간 달성률</Text>
         <LineChart
           data={{ labels: monthlyLabels, datasets: [{ data: monthlyData }] }}
           width={width - 32}
           height={220}
           yAxisSuffix="%"
           chartConfig={{
-            backgroundColor: '#fff',
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#fff',
+            backgroundGradientFrom: isDarkMode ? '#1E1E1E' : '#fff',
+            backgroundGradientTo: isDarkMode ? '#1E1E1E' : '#fff',
             decimalPlaces: 0,
             color: (opacity = 1) => theme,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) => isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
           }}
           style={{ marginVertical: 8, borderRadius: 16 }}
         />
@@ -103,3 +104,19 @@ export default function StatsScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    padding: 16,
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  darkText: {
+    color: '#FFFFFF',
+  },
+});
