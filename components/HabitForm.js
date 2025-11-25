@@ -115,12 +115,14 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
         <Picker
           selectedValue={repeatMode}
           style={[styles.picker, isDarkMode && styles.darkPicker]}
+          dropdownIconColor={isDarkMode ? 'white' : 'black'}
           onValueChange={(itemValue, itemIndex) => setRepeatMode(itemValue)}
-          itemStyle={isDarkMode ? { color: 'white' } : { color: 'black' }}
+          itemStyle={isDarkMode ? { color: 'white' } : { color: 'black' }} // iOS 피커 항목의 글자색
         >
-          <Picker.Item label="매주 반복" value="weekly" color={isDarkMode ? 'white' : 'black'} />
-          <Picker.Item label="반복 안함" value="never" color={isDarkMode ? 'white' : 'black'} />
-          <Picker.Item label="기간 설정" value="custom" color={isDarkMode ? 'white' : 'black'} />
+          {/* On Android, the color prop for Picker.Item sets the item text color. */}
+          <Picker.Item label="매주 반복" value="weekly" style={isDarkMode ? { backgroundColor: '#333', color: 'white' } : { backgroundColor: 'white', color: 'black' }} />
+          <Picker.Item label="반복 안함" value="never" style={isDarkMode ? { backgroundColor: '#333', color: 'white' } : { backgroundColor: 'white', color: 'black' }} />
+          <Picker.Item label="기간 설정" value="custom" style={isDarkMode ? { backgroundColor: '#333', color: 'white' } : { backgroundColor: 'white', color: 'black' }} />
         </Picker>
       </View>
       {repeatMode === 'custom' && (
