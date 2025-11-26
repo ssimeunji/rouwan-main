@@ -59,7 +59,11 @@ export default function StatsScreen() {
   const monthlyData = monthly.map(m => m.percent);
 
   // 주간 데이터
-  const labels = weekly.map(w => w.date.slice(5));
+  const labels = weekly.map(w => {
+    const date = new Date(w.date);
+    const dayOfWeek = date.toLocaleString('ko-KR', { weekday: 'short' });
+    return `${date.getDate()}(${dayOfWeek})`;
+  });
   const data = weekly.map(w => w.percent);
 
   return (
