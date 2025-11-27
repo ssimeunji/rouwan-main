@@ -1,4 +1,4 @@
-import { Dimensions, ScrollView, Text, View, StyleSheet, StatusBar } from 'react-native';
+import { Dimensions, ScrollView, Text, View, StyleSheet, StatusBar, Alert } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHabits } from '../hooks/useHabits';
@@ -58,6 +58,24 @@ export default function StatsScreen() {
   const monthlyLabels = monthly.map(m => m.month);
   const monthlyData = monthly.map(m => m.percent);
 
+  // 총 습관 달성 횟수 계산
+  const totalCompletionCount = habits.reduce((acc, habit) => {
+    return acc + (habit.records ? Object.keys(habit.records).length : 0);
+  }, 0);
+
+  const formatKoreanDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear().toString().slice(2);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  const weeklyDateRange = weekly.length > 0
+    ? `${formatKoreanDate(weekly[0].date)} ~ ${formatKoreanDate(weekly[weekly.length - 1].date)}`
+    : '';
+
+
   // 주간 데이터
   const labels = weekly.map(w => {
     const date = new Date(w.date);
@@ -70,7 +88,14 @@ export default function StatsScreen() {
     <SafeAreaView style={[{flex:1}, isDarkMode && styles.darkContainer]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={[styles.title, isDarkMode && styles.darkText]}>주간 달성률</Text>
+        <View style={[styles.statCard, isDarkMode && styles.darkStatCard]}>
+          <Text style={[styles.statLabel, isDarkMode && styles.darkText]}>총 달성 횟수</Text>
+          <Text style={[styles.statValue, { color: theme }]}>{totalCompletionCount}회</Text>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.title, isDarkMode && styles.darkText]}>주간 달성률</Text>
+          <Text style={[styles.dateRangeText, isDarkMode && styles.darkText]}>{weeklyDateRange}</Text>
+        </View>
         <LineChart
           data={{ labels, datasets: [{ data }] }}
           width={width - 32}
@@ -83,6 +108,12 @@ export default function StatsScreen() {
             decimalPlaces: 0,
             color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
             labelColor: (opacity = 1) => isDarkMode ? `rgba(255,255,255, ${opacity})` : `rgba(0,0,0, ${opacity})`,
+          }}
+          onDataPointClick={({ value, index }) => {
+            Alert.alert(
+              `${weekly[index].date}`,
+              `달성률: ${value}%`
+            );
           }}
           bezier
           style={{ marginVertical: 8, borderRadius: 16 }}
@@ -102,6 +133,12 @@ export default function StatsScreen() {
             color: (opacity = 1) => theme,
             labelColor: (opacity = 1) => isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
           }}
+          onDataPointClick={({ value, index }) => {
+            Alert.alert(
+              `${monthly[index].month}`,
+              `달성률: ${value}%`
+            );
+          }}
           style={{ marginVertical: 8, borderRadius: 16 }}
         />
       </ScrollView>
@@ -116,11 +153,40 @@ const styles = StyleSheet.create({
   darkContainer: {
     backgroundColor: '#121212',
   },
+  statCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  darkStatCard: {
+    backgroundColor: '#1E1E1E',
+  },
+  statLabel: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 8,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
   },
   darkText: {
     color: '#FFFFFF',
+  },
+  dateRangeText: {
+    fontSize: 12,
+    color: '#666',
   },
 });
