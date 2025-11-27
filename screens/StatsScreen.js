@@ -84,6 +84,15 @@ export default function StatsScreen() {
   });
   const data = weekly.map(w => w.percent);
 
+  const baseChartConfig = {
+    backgroundColor: isDarkMode ? '#1E1E1E' : '#fff',
+    backgroundGradientFrom: isDarkMode ? '#1E1E1E' : '#fff',
+    backgroundGradientTo: isDarkMode ? '#1E1E1E' : '#fff',
+    decimalPlaces: 0,
+    color: (opacity = 1) => theme,
+    labelColor: (opacity = 1) => isDarkMode ? `rgba(255,255,255, ${opacity})` : `rgba(0,0,0, ${opacity})`,
+  };
+
   return (
     <SafeAreaView style={[{flex:1}, isDarkMode && styles.darkContainer]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -92,55 +101,46 @@ export default function StatsScreen() {
           <Text style={[styles.statLabel, isDarkMode && styles.darkText]}>총 달성 횟수</Text>
           <Text style={[styles.statValue, { color: theme }]}>{totalCompletionCount}회</Text>
         </View>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.title, isDarkMode && styles.darkText]}>주간 달성률</Text>
-          <Text style={[styles.dateRangeText, isDarkMode && styles.darkText]}>{weeklyDateRange}</Text>
-        </View>
-        <LineChart
-          data={{ labels, datasets: [{ data }] }}
-          width={width - 32}
-          height={220}
-          yAxisSuffix="%"
-          chartConfig={{
-            backgroundColor: isDarkMode ? '#1E1E1E' : '#fff',
-            backgroundGradientFrom: isDarkMode ? '#1E1E1E' : '#fff',
-            backgroundGradientTo: isDarkMode ? '#1E1E1E' : '#fff',
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(76,175,80, ${opacity})`,
-            labelColor: (opacity = 1) => isDarkMode ? `rgba(255,255,255, ${opacity})` : `rgba(0,0,0, ${opacity})`,
-          }}
-          onDataPointClick={({ value, index }) => {
-            Alert.alert(
-              `${weekly[index].date}`,
-              `달성률: ${value}%`
-            );
-          }}
-          bezier
-          style={{ marginVertical: 8, borderRadius: 16 }}
-        />
 
-        <Text style={[styles.title, { marginTop: 24 }, isDarkMode && styles.darkText]}>월간 달성률</Text>
-        <LineChart
-          data={{ labels: monthlyLabels, datasets: [{ data: monthlyData }] }}
-          width={width - 32}
-          height={220}
-          yAxisSuffix="%"
-          chartConfig={{
-            backgroundColor: isDarkMode ? '#1E1E1E' : '#fff',
-            backgroundGradientFrom: isDarkMode ? '#1E1E1E' : '#fff',
-            backgroundGradientTo: isDarkMode ? '#1E1E1E' : '#fff',
-            decimalPlaces: 0,
-            color: (opacity = 1) => theme,
-            labelColor: (opacity = 1) => isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-          }}
-          onDataPointClick={({ value, index }) => {
-            Alert.alert(
-              `${monthly[index].month}`,
-              `달성률: ${value}%`
-            );
-          }}
-          style={{ marginVertical: 8, borderRadius: 16 }}
-        />
+        <View style={[styles.chartCard, isDarkMode && styles.darkChartCard]}>
+          <View style={styles.titleContainer}>
+            <Text style={[styles.title, isDarkMode && styles.darkText]}>주간 달성률</Text>
+            <Text style={[styles.dateRangeText, isDarkMode && styles.darkText]}>{weeklyDateRange}</Text>
+          </View>
+          <LineChart
+            data={{ labels, datasets: [{ data }] }}
+            width={width - 64} // Adjusted for card padding
+            height={220}
+            yAxisSuffix="%"
+            chartConfig={baseChartConfig}
+            onDataPointClick={({ value, index }) => {
+              Alert.alert(
+                `${weekly[index].date}`,
+                `달성률: ${value}%`
+              );
+            }}
+            bezier
+            style={styles.chartStyle}
+          />
+        </View>
+
+        <View style={[styles.chartCard, isDarkMode && styles.darkChartCard]}>
+          <Text style={[styles.title, { marginBottom: 8 }, isDarkMode && styles.darkText]}>월간 달성률</Text>
+          <LineChart
+            data={{ labels: monthlyLabels, datasets: [{ data: monthlyData }] }}
+            width={width - 64} // Adjusted for card padding
+            height={220}
+            yAxisSuffix="%"
+            chartConfig={baseChartConfig}
+            onDataPointClick={({ value, index }) => {
+              Alert.alert(
+                `${monthly[index].month}`,
+                `달성률: ${value}%`
+              );
+            }}
+            style={styles.chartStyle}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -159,14 +159,27 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 24,
     alignItems: 'center',
+    // Shadow for light mode
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   darkStatCard: {
     backgroundColor: '#1E1E1E',
+    elevation: 0, // Remove shadow in dark mode
   },
   statLabel: {
     fontSize: 16,
     color: '#666',
     marginBottom: 8,
+  },
+  darkStatLabel: {
+    color: '#A0A0A0',
   },
   statValue: {
     fontSize: 32,
@@ -176,7 +189,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: 8,
   },
   title: {
     fontSize: 18,
@@ -188,5 +200,26 @@ const styles = StyleSheet.create({
   dateRangeText: {
     fontSize: 12,
     color: '#666',
+  },
+  chartCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    // Shadow for light mode
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  darkChartCard: {
+    backgroundColor: '#1E1E1E',
+  },
+  chartStyle: {
+    marginVertical: 8,
   },
 });
