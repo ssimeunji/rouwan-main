@@ -1,9 +1,10 @@
-import { ActivityIndicator, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
+import { ActivityIndicator, FlatList, Text, View, StyleSheet, TouchableOpacity, ScrollView, StatusBar, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HabitItem from '../components/HabitItem';
 import { useHabits } from '../hooks/useHabits';
 import { formatISODate, getMonthDates } from '../utils/dateUtils';
 import { useTheme } from '../context/ThemeContext';
+import Icon from 'react-native-vector-icons/Feather';
 import { useState } from 'react';
 
 export default function HomeScreen() {
@@ -102,7 +103,7 @@ export default function HomeScreen() {
           style={[
             styles.dayButton,
             isSelected && styles.selectedDay,
-            isToday && { borderColor: shadeColor(theme, -20), borderWidth: 2 }
+            isSelected && { backgroundColor: theme },
           ]}
         >
           {typeof completion === 'number' && completion >= 0 && (
@@ -113,16 +114,17 @@ export default function HomeScreen() {
           )}
           <Text style={[
             styles.dayText,
-            isDarkMode && completion === -1 && !isSaturday && !isSunday && { color: '#888' }, // 다크모드, 할일없는 평일
-            isDarkMode && { color: '#fff' }, // 다크 모드일 때 텍스트 색상 변경
+            isDarkMode ? styles.darkDayText : styles.lightDayText,
             isSelected && styles.selectedDayText,
-            isToday && styles.todayText,
             isSaturday && styles.saturdayText,
             isSunday && styles.sundayText,
-            completion === -1 && styles.noHabitDayText,
+            completion === -1 && !isSelected && styles.noHabitDayText,
           ]}>
             {item ? new Date(item).getDate() : ''}
           </Text>
+          {isToday && (
+            <View style={[styles.todayIndicator, { backgroundColor: isSelected ? '#fff' : theme }]} />
+          )}
         </TouchableOpacity>
       </View>
     );
@@ -133,17 +135,17 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[{ flex: 1 }, isDarkMode && styles.darkContainer]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView contentContainerStyle={[styles.container, isDarkMode && styles.darkContainer]}>
-        <View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={[styles.card, isDarkMode && styles.darkCard]}>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={prevMonth} style={styles.navButton}>
-              <Text style={styles.navText}>{'‹'}</Text>
+              <Icon name="chevron-left" size={24} color={theme} />
             </TouchableOpacity>
             <Text style={[styles.monthTitle, isDarkMode && styles.darkText]}>
               {selectedMonthDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' })}
             </Text>
             <TouchableOpacity onPress={nextMonth} style={styles.navButton}>
-              <Text style={styles.navText}>{'›'}</Text>
+              <Icon name="chevron-right" size={24} color={theme} />
             </TouchableOpacity>
           </View>
 
@@ -161,20 +163,20 @@ export default function HomeScreen() {
             ))}
           </View>
 
-          <View style={[styles.calendar, isDarkMode && styles.darkCalendar]}>
+          <View style={styles.calendar}>
             {monthGrid.map((it, idx) => renderCalendarDay(it, idx))}
           </View>
         </View>
         <View style={styles.habitSection}>
           <Text style={[styles.sectionTitle, isDarkMode && styles.darkText]}>{new Date(selectedDate).toLocaleDateString('ko-KR')}의 할 일</Text>
           <FlatList
-            data={habitsForSelectedDay}
+            data={habitsForSelectedDay} 
             keyExtractor={item => item.id}
             renderItem={({item}) => <HabitItem habit={item} date={selectedDate} />}
             scrollEnabled={false}
             ListEmptyComponent={
-              <View style={[styles.emptyContainer, isDarkMode ? styles.darkRow : { backgroundColor: '#fff' }]}>
-                <Text style={styles.emptyText}>오늘의 습관이 없습니다.</Text>
+              <View style={[styles.card, styles.emptyContainer, isDarkMode && styles.darkCard]}>
+                <Text style={[styles.emptyText, isDarkMode && styles.darkText]}>오늘의 할 일이 없습니다.</Text>
               </View>
             }
           />
@@ -187,15 +189,31 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 16,
-    padding: 16,
+    paddingHorizontal: 16,
   },
   darkContainer: {
     backgroundColor: '#121212',
   },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    // Shadow for light mode
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  darkCard: {
+    backgroundColor: '#1E1E1E',
+    borderWidth: 1,
+    borderColor: '#272727',
+  },
   monthTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
   },
   darkText: {
     color: '#FFFFFF',
@@ -204,15 +222,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 16,
   },
   navButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-  },
-  navText: {
-    fontSize: 22,
-    color: '#007AFF',
   },
   weekHeader: {
     flexDirection: 'row',
@@ -231,13 +245,6 @@ const styles = StyleSheet.create({
   calendar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
-  },
-  darkCalendar: {
-    backgroundColor: '#1E1E1E',
   },
   calendarDay: {
     width: '14.28%',
@@ -255,20 +262,28 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   selectedDay: {
-    backgroundColor: '#fff',
-    borderColor: '#efefef',
-    borderWidth: 1,
+    // backgroundColor is set dynamically
   },
   selectedDayText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  lightDayText: {
     color: '#333',
   },
-  dayText: {
-    fontSize: 16,
-    color: '#000', // 기본 텍스트 색상을 검은색으로 명시
-    zIndex: 2, // 텍스트가 채우기 색상 위에 오도록 설정
+  darkDayText: {
+    color: '#E0E0E0',
   },
-  todayText: {
-    fontWeight: 'bold'
+  dayText: { // Common styles for day text
+    fontSize: 16,
+    zIndex: 2,
+  },
+  todayIndicator: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    position: 'absolute',
+    bottom: 5,
   },
   saturdayText: {
     color: '#007AFF', // 파란색
@@ -286,14 +301,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 16,
-  },
-  darkRow: {
-    backgroundColor: '#1E1E1E',
+    paddingHorizontal: 4, // To align with card content
   },
   emptyContainer: {
-    padding: 16,
-    borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
   },
   emptyText: {
     color: '#666',

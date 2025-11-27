@@ -1,74 +1,97 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useHabits } from '../hooks/useHabits';
-import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import Icon from 'react-native-vector-icons/Feather';
 
-const dayMap = {
-  Sun: '일', Mon: '월', Tue: '화', Wed: '수', Thu: '목', Fri: '금', Sat: '토'
-};
+export default function HabitItem({ habit, date, drag, isActive }) {
+  const { toggleHabit } = useHabits();
+  const { isDarkMode, theme } = useTheme();
+  const isCompleted = habit.records && habit.records[date];
 
-const toKoreanDays = (days) => {
-  return days.map(day => dayMap[day] || day).join(', ');
-};
-export default function HabitItem({ habit, date }) {
-  const { toggleHabit, deleteHabit } = useHabits();
-  const navigation = useNavigation();
-  const { isDarkMode } = useTheme();
-  const done = habit.records && habit.records[date];
-
-  function handleLongPress() {
-    Alert.alert(
-      '습관 관리',
-      `'${habit.title}' 습관을 어떻게 할까요?`,
-      [
-        { text: '삭제', onPress: () => deleteHabit(habit.id), style: 'destructive' },
-        { text: '수정', onPress: () => navigation.navigate('Edit', { habit }) },
-        { text: '취소', style: 'cancel' },
-      ],
-      { cancelable: true }
-    );
-  }
+  const handleToggle = () => {
+    // 'drag' prop이 있으면 토글 기능을 비활성화 (순서 변경 화면)
+    if (drag) return;
+    toggleHabit(habit.id, date);
+  };
 
   return (
     <TouchableOpacity
-      onLongPress={handleLongPress}
-      delayLongPress={500}
-      activeOpacity={0.7}
+      onPress={handleToggle}
+      onLongPress={drag}
+      delayLongPress={100}
+      style={[
+        styles.container,
+        isDarkMode ? styles.darkContainer : styles.lightContainer,
+        isActive && styles.active,
+      ]}
+      activeOpacity={drag ? 0.7 : 0.5}
     >
-      <View style={[
-        styles.row,
-        isDarkMode ? styles.darkRow : { backgroundColor: '#fff' },
-        habit.color ? { backgroundColor: habit.color } : {}
-      ]}>
-        <View style={styles.left}>
-          <Text style={[styles.title, isDarkMode && !habit.color && styles.darkText]}>{habit.icon} {habit.title}</Text>
-          <Text style={styles.days}>{toKoreanDays(habit.days)}</Text>
-        </View>
-        <TouchableOpacity
-          accessibilityLabel={`toggle-${habit.id}`}
-          style={[styles.check, done ? styles.checked : styles.unchecked]}
-          onPress={() => toggleHabit(habit.id, date)}
-        >
-          <Text style={styles.checkText}>{done ? '완료' : '체크'}</Text>
-        </TouchableOpacity>
+      <View style={styles.leftContainer}>
+        <Text style={styles.icon}>{habit.icon}</Text>
+        <Text style={[styles.title, isDarkMode && styles.darkText]}>{habit.title}</Text>
       </View>
+
+      {drag ? (
+        <Icon name="menu" size={24} color={isDarkMode ? '#888' : '#ccc'} />
+      ) : (
+        <TouchableOpacity onPress={handleToggle} style={styles.checkbox}>
+          {isCompleted ? (
+            <Icon name="check-square" size={24} color={theme} />
+          ) : (
+            <Icon name="square" size={24} color={isDarkMode ? '#555' : '#ccc'} />
+          )}
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 8, marginBottom: 8 },
-  darkRow: {
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  lightContainer: {
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+  darkContainer: {
     backgroundColor: '#1E1E1E',
+    borderWidth: 1,
+    borderColor: '#272727',
   },
-  left: { flex: 1 },
-  title: { fontSize: 16, fontWeight: '600' },
+  active: {
+    transform: [{ scale: 1.02 }],
+    shadowOpacity: 0.2,
+    elevation: 10,
+  },
+  leftContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  icon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  title: {
+    fontSize: 16,
+    color: '#333',
+    flexShrink: 1, // Allow text to shrink if needed
+  },
   darkText: {
-    color: '#FFFFFF',
+    color: '#E0E0E0',
   },
-  days: { color: '#666', marginTop: 4 },
-  check: { padding: 10, borderRadius: 8 },
-  checked: { backgroundColor: '#4caf50' },
-  unchecked: { backgroundColor: '#ddd' },
-  checkText: { color: '#fff' }
+  checkbox: {
+    padding: 4, // Increase touchable area
+  },
 });
