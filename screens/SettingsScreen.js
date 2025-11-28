@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Switch, Text, View, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import { Switch, Text, View, TouchableOpacity, Platform, StyleSheet, Alert, DevSettings } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { cancelAllReminders, requestPermissionsAsync, scheduleDailyReminder } from '../hooks/useNotifications';
 let DateTimePicker;
@@ -80,6 +80,28 @@ export default function SettingsScreen() {
     }
   }
 
+  const handleResetData = () => {
+    Alert.alert(
+      "모든 데이터 초기화",
+      "정말 모든 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      [
+        {
+          text: "취소",
+          style: "cancel"
+        },
+        { 
+          text: "초기화", 
+          onPress: async () => {
+            await AsyncStorage.clear();
+            Alert.alert("완료", "모든 데이터가 초기화되었습니다. 앱을 다시 시작합니다.", [
+              { text: "확인", onPress: () => DevSettings.reload() }
+            ]);
+          },
+          style: 'destructive' 
+        }
+      ]
+    );
+  };
 
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -126,6 +148,13 @@ export default function SettingsScreen() {
           />
 
         ))}
+      </View>
+
+      <Text style={[styles.sectionTitle, { marginTop: 24, color: '#FF3B30' }]}>위험 구역</Text>
+      <View style={[styles.row, isDarkMode && styles.darkRow]}>
+        <TouchableOpacity onPress={handleResetData} style={{width: '100%'}}>
+          <Text style={[styles.rowLabel, { color: '#FF3B30', textAlign: 'center' }]}>모든 데이터 초기화</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
