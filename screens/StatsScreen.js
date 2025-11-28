@@ -99,7 +99,7 @@ export default function StatsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={[styles.statCard, isDarkMode && styles.darkStatCard]}>
           <Text style={[styles.statLabel, isDarkMode && styles.darkText]}>총 달성 횟수</Text>
-          <Text style={[styles.statValue, { color: theme }]}>{totalCompletionCount}회</Text>
+          <Text style={[styles.statValue]}>{totalCompletionCount}회</Text>
         </View>
 
         <View style={[styles.chartCard, isDarkMode && styles.darkChartCard]}>
