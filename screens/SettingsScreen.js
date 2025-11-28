@@ -14,7 +14,7 @@ export default function SettingsScreen() {
   const [enabled, setEnabled] = useState(false);
   const [time, setTime] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const { theme, changeTheme, themes, isDarkMode, toggleDarkMode } = useTheme();
+  const { theme, changeTheme, themes, isDarkMode, toggleDarkMode, weekStartDay, changeWeekStartDay } = useTheme();
 
   useEffect(() => {
     // 저장된 알림 설정 불러오기
@@ -150,6 +150,21 @@ export default function SettingsScreen() {
         ))}
       </View>
 
+      <Text style={[styles.sectionTitle, { marginTop: 24 }, isDarkMode && styles.darkText]}>달력 설정</Text>
+      <View style={[styles.row, isDarkMode && styles.darkRow, { paddingVertical: 0 }]}>
+        <TouchableOpacity onPress={() => changeWeekStartDay('Sun')} style={[styles.toggleButton, weekStartDay === 'Sun' && { backgroundColor: theme }]}>
+          <Text style={[styles.toggleButtonText, isDarkMode && styles.darkText, weekStartDay === 'Sun' && styles.selectedToggleButtonText]}>
+            일요일 시작
+          </Text>
+        </TouchableOpacity>
+        <View style={{ width: 1, height: '60%', backgroundColor: isDarkMode ? '#333' : '#eee' }} />
+        <TouchableOpacity onPress={() => changeWeekStartDay('Mon')} style={[styles.toggleButton, weekStartDay === 'Mon' && { backgroundColor: theme }]}>
+          <Text style={[styles.toggleButtonText, isDarkMode && styles.darkText, weekStartDay === 'Mon' && styles.selectedToggleButtonText]}>
+            월요일 시작
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <Text style={[styles.sectionTitle, { marginTop: 24, color: '#FF3B30' }]}>위험 구역</Text>
       <View style={[styles.row, isDarkMode && styles.darkRow]}>
         <TouchableOpacity onPress={handleResetData} style={{width: '100%'}}>
@@ -208,5 +223,17 @@ const styles = StyleSheet.create({
   selectedColor: {
     borderWidth: 3,
     borderColor: '#8E8E93', // A neutral color for the selection border
+  },
+  toggleButton: {
+    flex: 1,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  toggleButtonText: {
+    fontSize: 16,
+  },
+  selectedToggleButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

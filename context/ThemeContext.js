@@ -24,6 +24,7 @@ export const ThemeProvider = ({ children }) => {
 
   // 다크모드 상태
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [weekStartDay, setWeekStartDay] = useState('Sun'); // 'Sun' or 'Mon'
 
   // 🔥 앱 시작 시 저장된 테마 / 다크모드 로드
   useEffect(() => {
@@ -31,11 +32,15 @@ export const ThemeProvider = ({ children }) => {
       try {
         const savedThemeKey = await AsyncStorage.getItem('app_theme_key');
         const savedDarkMode = await AsyncStorage.getItem('dark_mode');
+        const savedWeekStartDay = await AsyncStorage.getItem('week_start_day');
         const darkMode = savedDarkMode === 'true';
         setIsDarkMode(darkMode);
 
         if (savedThemeKey && THEMES[savedThemeKey]) {
           setThemeKey(savedThemeKey);
+        }
+        if (savedWeekStartDay) {
+          setWeekStartDay(savedWeekStartDay);
         }
 
       } catch (e) {
@@ -66,6 +71,15 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
+  const changeWeekStartDay = async (day) => {
+    try {
+      await AsyncStorage.setItem('week_start_day', day);
+      setWeekStartDay(day);
+    } catch (e) {
+      console.error('Failed to save week start day', e);
+    }
+  };
+
   const currentThemeSet = isDarkMode ? DARK_THEMES : THEMES;
 
   return (
@@ -76,6 +90,8 @@ export const ThemeProvider = ({ children }) => {
         themes: isDarkMode ? DARK_THEMES : THEMES,
         isDarkMode,       // 🔥 추가됨
         toggleDarkMode,   // 🔥 추가됨
+        weekStartDay,
+        changeWeekStartDay,
       }}
     >
       {children}

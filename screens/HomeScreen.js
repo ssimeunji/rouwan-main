@@ -9,7 +9,7 @@ import { useState } from 'react';
 
 export default function HomeScreen() {
   const { habits, loading: habitsLoading, reorderHabits, toggleHabit, deleteHabit } = useHabits();
-  const { theme, isDarkMode } = useTheme();
+  const { theme, isDarkMode, weekStartDay } = useTheme();
   
   const today = new Date();
   const todayISO = formatISODate(today);
@@ -35,8 +35,14 @@ export default function HomeScreen() {
   const getMonthGrid = (refDate) => {
     const monthDates = getMonthDates(refDate); // ISO strings for each day of month
     const first = new Date(refDate.getFullYear(), refDate.getMonth(), 1);
-    const leading = first.getDay(); // 0 = Sunday ... 6 = Saturday
     const grid = [];
+
+    let leading;
+    if (weekStartDay === 'Sun') {
+      leading = first.getDay(); // 0 = Sunday ... 6 = Saturday
+    } else { // 'Mon'
+      leading = (first.getDay() + 6) % 7; // 0 = Monday ... 6 = Sunday
+    }
     // add leading placeholders (null) so the 1st falls on correct weekday (Sunday-start)
     for (let i = 0; i < leading; i++) grid.push(null);
     // then push the actual dates
@@ -45,6 +51,9 @@ export default function HomeScreen() {
   };
 
   const monthGrid = getMonthGrid(selectedMonthDate);
+  const weekDays = weekStartDay === 'Sun'
+    ? ['일', '월', '화', '수', '목', '금', '토']
+    : ['월', '화', '수', '목', '금', '토', '일'];
 
   // 날짜별 달성률 계산
   const completionRates = monthGrid.reduce((acc, isoDate) => {
@@ -158,14 +167,15 @@ export default function HomeScreen() {
 
           {/* weekday header starting Sunday */}
           <View style={styles.weekHeader}>
-            {['일', '월', '화', '수', '목', '금', '토'].map((w, index) => (
+            {weekDays.map((w) => (
               <Text
                 key={w}
                 style={[
                   styles.weekHeaderText,
                   isDarkMode && styles.darkWeekHeaderText,
-                  index === 0 && styles.sundayText, // '일'요일 (index 0)
-                  index === 6 && styles.saturdayText, // '토'요일 (index 6)
+                  // Apply color based on the day, not index
+                  (w === '일') && styles.sundayText,
+                  (w === '토') && styles.saturdayText,
                 ]}>{w}</Text>
             ))}
           </View>
