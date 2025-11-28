@@ -82,6 +82,11 @@ export default function HomeScreen() {
     setSelectedMonthDate(d);
   };
 
+  const goToToday = () => {
+    setSelectedMonthDate(new Date());
+    setSelectedDate(todayISO);
+  };
+
   const renderCalendarDay = (item, idx) => {
     if (!item) {
       // placeholder
@@ -141,9 +146,11 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={prevMonth} style={styles.navButton}>
               <Icon name="chevron-left" size={24} color={theme} />
             </TouchableOpacity>
-            <Text style={[styles.monthTitle, isDarkMode && styles.darkText]}>
-              {selectedMonthDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' })}
-            </Text>
+            <TouchableOpacity onPress={goToToday}>
+              <Text style={[styles.monthTitle, isDarkMode && styles.darkText]}>
+                {selectedMonthDate.toLocaleString('ko-KR', { month: 'long', year: 'numeric' })}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={nextMonth} style={styles.navButton}>
               <Icon name="chevron-right" size={24} color={theme} />
             </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity, Platform } from 'react-native';
+import { Alert, Button, StyleSheet, Text, TextInput, View, TouchableOpacity, Platform } from 'react-native';
 import IconPicker from './IconPicker';
 import { useTheme } from '../context/ThemeContext';
 import WeekSelector from './WeekSelector';
@@ -57,7 +57,17 @@ export default function HabitForm({ onSubmit, habit: initialHabit }) {
   };
 
   function handleSubmit() {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      Alert.alert('오류', '제목을 입력해주세요.');
+      return;
+    }
+
+    // '반복 안함' 모드가 아닐 경우, 요일이 최소 하나 이상 선택되어야 함
+    // '반복 안함'은 현재 주에만 적용되므로 요일 선택이 필수적이지 않음 (혹은 현재 요일로 자동 설정되어야 함)
+    if (repeatMode !== 'never' && days.length === 0) {
+      Alert.alert('오류', '요일을 최소 하나 이상 선택해주세요.');
+      return;
+    }
 
     let habitStartDate = startDate.toISOString().split('T')[0];
     let habitEndDate = endDate ? endDate.toISOString().split('T')[0] : null;
